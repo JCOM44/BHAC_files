@@ -1,0 +1,12 @@
+#undefine EPSINF
+#undefine GLM
+#define STAGGERED
+#undefine HALL
+#undefine UCONVERT
+#undefine SAVENOW
+#undefine TRANSFORMW
+#undefine RAY
+#undefine BIGENDIAN
+#undefine FOURTHORDER
+#undefine SPECIALTOLERANCE
+#undefine PARTICLES

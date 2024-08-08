@@ -1,0 +1,65 @@
+! setup with:
+! $BHAC_DIR/setup.pl -d=33 -phi=2 -z=3 -g=12,12,12 -p=rmhd -eos=default -nf=0 -ndust=0 -u=nul -arch=gfortran -coord=cart
+! #define STAGGERED
+ 
+ &filelist
+    primnames           = 'rho u1 u2 u3 p b1 b2 b3 lfac xi'
+	autoconvert     = .true.
+        convert_type    = 'vtuBCCmpi'
+	filenameini     = 'output/data'
+	filenameout     = 'output/data'
+	filenamelog     = 'output/amrvac'
+        nwauxio         = 1
+        collapse_type   = 'vti'
+        typeparIO       = -2
+ &end
+
+ &savelist
+        itsave(1,1)     = 0
+        ditsave(1)      = 10
+ &end
+
+ &stoplist
+        itmax           = 50
+        dtmin           = 1.d-6
+ &end
+
+ &methodlist
+        wnames          = 'd s1 s2 s3 tau b1 b2 b3 lfac xi'
+        typeadvance     = 'twostep'
+        typefull1       = 13*'hll'
+        typelimiter1    = 13*'cada3'
+        typeemf         = 'uct2'
+        clean_init_divB = 'none'
+        strictgetaux    = T
+ &end
+
+ &boundlist
+        dixB            = 2
+        typeB           = 10*'cont'
+                          10*'cont'
+			  10*'periodic'
+			  10*'periodic'
+			  10*'periodic'
+			  10*'periodic'
+ &end
+
+ &amrlist
+        mxnest          = 1
+        nxlone1         = 192
+        nxlone2         = 192
+        nxlone3         = 192
+        xprobmin1       =-0.125
+        xprobmax1       =+0.125
+        xprobmin2       =-0.125
+        xprobmax2       =+0.125
+        xprobmin3       =-0.125
+        xprobmax3       =+0.125
+        prolongprimitive= .true.
+ &end
+
+ &paramlist
+       slowsteps        = 20
+       courantpar       = 0.8d0
+       typecourant      = 'maxsum'
+ &end
