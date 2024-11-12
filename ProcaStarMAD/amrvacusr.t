@@ -221,18 +221,6 @@ subroutine set_atmo(ixI^L,ixO^L,w,x)
   !! If the simulation includes the origin, it is important to remove the
   !! singularity in the atmosphere profle, with r0.
 
-  !! Set to atmosphere and set velocities to zero values where the tracer is small
-  where(w(ixO^S,tr1_).lt.0.01d0)
-     w(ixO^S,rho_) = eqpar(rhomin_) * (r0+ xBL(ixO^S,1))**(-1.5d0)
-     {#IFDEF ISO
-     w(ixO^S,pp_)   = eqpar(adiab_) * w(ixO^S,rho_)**eqpar(gamma_)
-     }{#IFNDEF ISO
-     w(ixO^S,pp_)   = eqpar(pmin_) * (r0+ xBL(ixO^S,1))**(-2.5d0)
-     }
-    {^C&w(ixO^S,v^C_) = zero\}
-     patchw(ixO^S) = .true.
-  end where
-
   !! Set rho to atmosphere where it is too small
   where(w(ixO^S,rho_) .lt. eqpar(rhomin_) * (r0+ xBL(ixO^S,1))**(-1.5d0))
      w(ixO^S,rho_) = eqpar(rhomin_) * (r0+ xBL(ixO^S,1))**(-1.5d0)
@@ -246,7 +234,18 @@ subroutine set_atmo(ixI^L,ixO^L,w,x)
      }{#IFNDEF ISO
      w(ixO^S,pp_)   = eqpar(pmin_) * (r0+ xBL(ixO^S,1))**(-2.5d0)
      }
+     patchw(ixO^S) = .true.
+  end where
 
+  !! Set to atmosphere and set velocities to zero values where the tracer is small
+  where(w(ixO^S,tr1_).lt.0.01d0)
+     w(ixO^S,rho_) = eqpar(rhomin_) * (r0+ xBL(ixO^S,1))**(-1.5d0)
+     {#IFDEF ISO
+     w(ixO^S,pp_)   = eqpar(adiab_) * w(ixO^S,rho_)**eqpar(gamma_)
+     }{#IFNDEF ISO
+     w(ixO^S,pp_)   = eqpar(pmin_) * (r0+ xBL(ixO^S,1))**(-2.5d0)
+     }
+    {^C&w(ixO^S,v^C_) = zero\}
      patchw(ixO^S) = .true.
   end where
 
@@ -436,13 +435,13 @@ end subroutine correctaux_usr
 
          call CoordToBL(ixG^LL,ixM^LL,x,xBL)
          ! re-normalize outside of floors
-         where(w(ixM^T,rho_) .ge. eqpar(rhomin_) * xBL(ixM^T,1)**(-1.5d0))
+          where(w(ixM^T,rho_) .ge. eqpar(rhomin_) * xBL(ixM^T,1)**(-1.5d0))
             w(ixM^T,rho_) = w(ixM^T,rho_)*norm
             w(ixM^T,pp_)  = w(ixM^T,pp_)*norm
             {#IFDEF ENTROPY
             w(ixM^T,s_)   = w(ixM^T,pp_) * w(ixM^T,rho_)**(-eqpar(gamma_))
             }
-         end where
+          end where
 
          ! Now density is normalized to one.  Set up the magnetic field:
          {#IFNDEF STAGGERED
@@ -489,6 +488,9 @@ end subroutine correctaux_usr
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   ! since we changed pressure and density, max pressure is now
+
+  ! print *, 'pmax before norm',pmax
+
   pmax = pmax * norm
   
   do iigrid=1,igridstail; igrid=igrids(iigrid);
@@ -515,6 +517,7 @@ end subroutine correctaux_usr
        call set_tmpGlobals(igrid)
 
        call primitive(ixG^LL,ixM^LL,w,x)
+
 {#IFNDEF STAGGERED
        {^D& w(ixM^T,b^D_) = norm*w(ixM^T,b^D_) \}
 }{#IFDEF STAGGERED
@@ -628,7 +631,6 @@ double precision, intent(out)      :: A(ixI^S)
  case(^Z)
     A(ixC^S) = zero
  case(^PHI)
-
     call CoordToBL(ixI^L,ixC^L,xC,xBL)
 
     A(ixC^S) = ((xBL(ixC^S,1)*sin(xBL(ixC^S,^Z))/eqpar(rin_))**3)*exp(-xBL(ixC^S,1)/400.d0)

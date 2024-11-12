@@ -58,6 +58,7 @@
         typefull1       = 13*'tvdlf'
         typelimiter1    = 13*'ppm'
         typeemf         = 'uct2'
+        clean_init_divB = 'vecpot' !'none'
         tlow            = 1.0d-6
         strictgetaux    = F
         typeinversion   = '2D1DEntropy'
@@ -81,8 +82,8 @@
  &end
 
  &amrlist
-        mxnest            = 4
         errorestimate     = 0
+        mxnest            = 4
         nxlone1           = 64 !128 !192
         nxlone2           = 16 !48 !96
         nxlone3           = 16 !48 !96
@@ -100,6 +101,6 @@
 
  &paramlist
        slowsteps        = 0
-       courantpar       = 0.9d0
+       courantpar       = 0.5d0
        typecourant      = 'maxsum'
  &end
